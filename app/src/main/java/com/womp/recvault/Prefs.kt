@@ -16,6 +16,11 @@ class Prefs(ctx: Context) {
         get() = sp.getString("deviceLabel", null) ?: sanitize(Build.MODEL ?: "phone").also { deviceLabel = it }
         set(v) { sp.edit().putString("deviceLabel", sanitize(v)).commit() }
 
+    /** Recording quality in kbps (see recvault.core.Quality). Unknown values fall back to the default. */
+    var qualityKbps: Int
+        get() = sp.getInt("qualityKbps", recvault.core.Quality.DEFAULT.kbps)
+        set(v) { sp.edit().putInt("qualityKbps", v).commit() }
+
     var lastHeartbeatMs: Long
         get() = sp.getLong("hb", 0)
         set(v) { sp.edit().putLong("hb", v).apply() }

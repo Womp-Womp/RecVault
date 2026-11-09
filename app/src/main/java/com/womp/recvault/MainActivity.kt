@@ -19,6 +19,8 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
@@ -30,6 +32,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import recvault.core.Cloud
+import recvault.core.Quality
 
 class MainActivity : Activity() {
     companion object {
@@ -118,6 +121,31 @@ class MainActivity : Activity() {
         col.addView(button("Connect Google Drive") { connectGoogle() })
         if (prefs.configured(Cloud.ONEDRIVE)) col.addView(button("Connect OneDrive") { connectOneDrive() })
         col.addView(button("Let RecVault run unrestricted (battery)") { battery() })
+
+        col.addView(TextView(this).apply {
+            text = "Recording quality"; textSize = 18f; setTypeface(typeface, Typeface.BOLD)
+            setPadding(0, dp(20), 0, dp(4))
+        })
+        val qualityGroup = RadioGroup(this)
+        for (q in Quality.values()) {
+            qualityGroup.addView(RadioButton(this).apply {
+                id = q.kbps
+                text = "${q.label}: ${q.kbps} kbps, about ${q.perDayText} per day\n${q.blurb}"
+                textSize = 15f
+                setPadding(0, dp(6), 0, dp(6))
+            })
+        }
+        qualityGroup.check(Quality.fromKbps(prefs.qualityKbps).kbps)
+        qualityGroup.setOnCheckedChangeListener { _, checkedId ->
+            val q = Quality.fromKbps(checkedId)
+            if (q.kbps == prefs.qualityKbps) return@setOnCheckedChangeListener
+            prefs.qualityKbps = q.kbps
+            if (RecorderService.running) {
+                RecorderService.rotateNow(this) // current chunk is saved; new quality starts now
+                toast("${q.label} quality: starting a new chunk now")
+            } else toast("${q.label} quality selected")
+        }
+        col.addView(qualityGroup)
 
         for (c in Cloud.values()) {
             if (!prefs.configured(c)) continue

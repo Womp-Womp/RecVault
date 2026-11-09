@@ -17,12 +17,12 @@
 <p>"I use it; I wouldn't if I hadn't needed to 100% rely on it perfectly. Evidence provided when requested :)."</p>
 </blockquote>
 
-<a class="btn" href="RecVault-1.2.apk" download>Download RecVault 1.2 (APK, 6.7 MB)</a>
+<a class="btn" href="RecVault-1.3.apk" download>Download RecVault 1.3 (APK, 6.7 MB)</a>
 <a class="btn ghost" href="https://github.com/Womp-Womp/RecVault">Source code</a>
 
 <div class="card">
-<strong>Check your download.</strong> SHA-256 of <code>RecVault-1.2.apk</code> (7,024,083 bytes):
-<code class="hash">86A6D59131D5C1A527F346E8D5161C50EE6A3D9722ADCA116A6082DBA11756F6</code>
+<strong>Check your download.</strong> SHA-256 of <code>RecVault-1.3.apk</code> (7,029,495 bytes):
+<code class="hash">237C8A740C3FC24B286E64FED7A197FCFBE050B50676CF7DB3CE08600A8D6F00</code>
 <span class="muted">Signing certificate SHA-1: <code>DF:E2:A5:02:26:FF:3F:7A:27:B6:25:E9:0D:6C:7E:93:90:18:D9:DF</code>. Android refuses to install an APK if even one byte was changed.</span>
 </div>
 
@@ -35,7 +35,7 @@
 <li><strong>Never deletes anything.</strong> Your recordings stay on the phone even if you uninstall the app.</li>
 <li><strong>A dead battery costs seconds, not the recording.</strong> Everything up to the moment the phone died still plays.</li>
 <li><strong>Private.</strong> No ads, no tracking, no company servers. Your recordings go from your phone to your Drive and nowhere else.</li>
-<li><strong>Light on space:</strong> about 350 MB a day of nonstop recording.</li>
+<li><strong>You pick the quality.</strong> Voice (about 350 MB a day), Standard (about 690 MB a day) or High (about 1.4 GB a day, keeps every laugh and breath). You can switch any time.</li>
 </ul>
 
 <h2>Install</h2>
@@ -50,10 +50,11 @@
 <div class="table-wrap">
 <table>
 <tr><th colspan="2">Recording</th></tr>
-<tr><td>Format</td><td>AAC-LC in an ADTS stream (<code>.aac</code>), mono, 32 kHz, 32 kbps, phone microphone</td></tr>
+<tr><td>Format</td><td>AAC-LC in an ADTS stream (<code>.aac</code>), mono, phone microphone</td></tr>
+<tr><td>Quality (selectable)</td><td>Voice: 32 kbps @ 32 kHz · Standard (default): 64 kbps @ 44.1 kHz · High: 128 kbps @ 48 kHz. A change starts a new chunk immediately</td></tr>
 <tr><td>Chunks</td><td>15 minutes each, back to back; the switch gap is measured and shown in the app</td></tr>
-<tr><td>Power-loss safety</td><td>ADTS frames (~32 ms each) are self-contained, so a cut-off chunk plays up to its last written frame</td></tr>
-<tr><td>Storage use</td><td>~14 MB/hour · ~350 MB/day · ~10.5 GB/month</td></tr>
+<tr><td>Power-loss safety</td><td>ADTS frames (1024 samples, 21–32 ms) are self-contained, so a cut-off chunk plays up to its last written frame</td></tr>
+<tr><td>Storage use (24/7)</td><td>Voice ~350 MB/day (~10.5 GB/month) · Standard ~690 MB/day (~21 GB/month) · High ~1.4 GB/day (~41 GB/month)</td></tr>
 <tr><td>Saved to</td><td><code>Recordings/RecVault/</code> (Android 12+) or <code>Music/RecVault/</code> (Android 10–11), public MediaStore folder that survives uninstall</td></tr>
 <tr><th colspan="2">Backup</th></tr>
 <tr><td>Destination</td><td><code>My Drive › RecVault › &lt;phone name&gt;</code>, via Drive API v3 resumable upload</td></tr>

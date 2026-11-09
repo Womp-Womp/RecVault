@@ -50,6 +50,8 @@ object StatusText {
             }
         ).append("\n")
         if (RecorderService.lastGapMs >= 0) sb.append("   last chunk switch gap: ${RecorderService.lastGapMs} ms\n")
+        val q = recvault.core.Quality.fromKbps(p.qualityKbps)
+        sb.append("   quality: ${q.label}, ${q.kbps} kbps (~${q.perDayText}/day)\n")
         sb.append("   device label: ${p.deviceLabel}\n\n")
         for (c in Cloud.values()) {
             val name = if (c == Cloud.DRIVE) "GOOGLE DRIVE" else "ONEDRIVE"

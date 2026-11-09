@@ -14,6 +14,7 @@ import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Log
+import recvault.core.Quality
 import recvault.core.StallPolicy
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,6 +31,7 @@ class RecorderService : Service() {
         const val TAG = "RecVault"
         const val CHUNK_MS = 15 * 60 * 1000L
         const val ACTION_STOP = "com.womp.recvault.STOP"
+        const val ACTION_ROTATE = "com.womp.recvault.ROTATE"
 
         /** The chunk being written right now. The uploader never touches it. */
         @Volatile var liveUri: Uri? = null
@@ -41,6 +43,11 @@ class RecorderService : Service() {
 
         fun start(ctx: Context) {
             ctx.startForegroundService(Intent(ctx, RecorderService::class.java))
+        }
+
+        /** Close the current chunk and start a new one now (e.g. so a new quality applies immediately). */
+        fun rotateNow(ctx: Context) {
+            if (running) ctx.startService(Intent(ctx, RecorderService::class.java).setAction(ACTION_ROTATE))
         }
 
         fun stop(ctx: Context) {
@@ -94,6 +101,10 @@ class RecorderService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_ROTATE) {
+            if (running) rotateChunk()
+            return START_STICKY
+        }
         if (intent?.action == ACTION_STOP) {
             shutdown()
             stopForeground(STOP_FOREGROUND_REMOVE)
@@ -147,8 +158,9 @@ class RecorderService : Service() {
             r.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
             r.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             r.setAudioChannels(1)
-            r.setAudioSamplingRate(32000)
-            r.setAudioEncodingBitRate(32000) // ~350 MB per 24h, clear speech
+            val q = Quality.fromKbps(prefs.qualityKbps)
+            r.setAudioSamplingRate(q.sampleRate)
+            r.setAudioEncodingBitRate(q.bitRate)
             r.setOutputFile(fd.fileDescriptor)
             r.setOnErrorListener { _, what, extra -> handler.post { onRecorderError("MediaRecorder error $what/$extra") } }
             r.prepare()

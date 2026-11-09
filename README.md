@@ -19,12 +19,12 @@ RecVault records in 15-minute chunks and uploads each finished chunk to Google D
 - **Never deletes anything.** Your recordings stay on the phone even if you uninstall the app.
 - **A dead battery costs seconds, not the recording.** Everything up to the moment the phone died still plays.
 - **Private.** No ads, no tracking, no company servers. Your recordings go from your phone to your Drive and nowhere else.
-- **Light on space:** about 350 MB a day of nonstop recording.
+- **You pick the quality.** Voice (about 350 MB a day), Standard (about 690 MB a day) or High (about 1.4 GB a day, keeps every laugh and breath). You can switch any time.
 
 ## What it guarantees
 
 - **Nothing is deleted.** RecVault has no delete code. Recordings live in the public `Recordings/RecVault` folder and survive uninstalling the app.
-- **Power loss costs seconds, not the chunk.** Audio is AAC in an ADTS stream, so every ~32 ms frame stands alone. A half-written chunk still plays.
+- **Power loss costs seconds, not the chunk.** Audio is AAC in an ADTS stream, so every frame (21–32 ms of audio) stands alone. A half-written chunk still plays.
 - **Verified, not assumed.** After uploading, RecVault re-lists the cloud folder and compares fingerprints. It never trusts an upload response alone.
 - **No silent failure.** If the alarm is quiet, every recording older than 75 minutes is confirmed in the cloud. That rule is machine-checked (see below).
 - **No ads, no analytics, no servers.** The only network traffic is between your phone and your own Google account. Scope is `drive.file`: RecVault can only see files it created.
@@ -34,10 +34,11 @@ RecVault records in 15-minute chunks and uploads each finished chunk to Google D
 | | |
 |---|---|
 | **Recording** | |
-| Format | AAC-LC in an ADTS stream (`.aac`), mono, 32 kHz, 32 kbps, phone microphone |
+| Format | AAC-LC in an ADTS stream (`.aac`), mono, phone microphone |
+| Quality (selectable) | Voice: 32 kbps @ 32 kHz · Standard (default): 64 kbps @ 44.1 kHz · High: 128 kbps @ 48 kHz. A change starts a new chunk immediately |
 | Chunks | 15 minutes each, back to back; the switch gap is measured and shown in the app |
-| Power-loss safety | ADTS frames (~32 ms each) are self-contained, so a cut-off chunk plays up to its last written frame |
-| Storage use | ~14 MB/hour · ~350 MB/day · ~10.5 GB/month |
+| Power-loss safety | ADTS frames (1024 samples, 21–32 ms) are self-contained, so a cut-off chunk plays up to its last written frame |
+| Storage use (24/7) | Voice ~350 MB/day (~10.5 GB/month) · Standard ~690 MB/day (~21 GB/month) · High ~1.4 GB/day (~41 GB/month) |
 | Saved to | `Recordings/RecVault/` (Android 12+) or `Music/RecVault/` (Android 10–11), public MediaStore folder that survives uninstall |
 | **Backup** | |
 | Destination | `My Drive › RecVault › <phone name>`, Drive API v3 resumable upload |
