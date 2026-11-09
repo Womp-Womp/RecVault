@@ -4,6 +4,10 @@
 
 [Download the APK](https://womp-womp.github.io/RecVault/) · [Privacy policy](https://womp-womp.github.io/RecVault/privacy.html)
 
+> I built RecVault so my Poppy could tell me his life story, in his own voice, as he went into hospice, and so not one word of it would ever be lost.
+>
+> "I use it; I wouldn't if I hadn't needed to 100% rely on it perfectly. Evidence provided when requested :)."
+
 RecVault records in 15-minute chunks and uploads each finished chunk to Google Drive. A file only counts as backed up when Drive reports the same name, size and MD5 fingerprint as the file on the phone. If a recording is still unconfirmed after 75 minutes, or recording stops, or the phone is low on space, you get an alarm-sound notification that won't swipe away and that says why.
 
 ## In plain words
