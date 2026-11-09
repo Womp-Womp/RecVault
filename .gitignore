@@ -1,0 +1,8 @@
+.gradle/
+build/
+local.properties
+keystore/
+*.jks
+
+# APK builds live in docs/ (served by GitHub Pages); keep stray builds out of the root
+/*.apk

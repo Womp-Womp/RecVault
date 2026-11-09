@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RecVault</title>
+<meta name="description" content="Continuous voice recording on Android, backed up to your own Google Drive, with an alarm when a backup is missing.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>RecVault</h1>
+<p>Continuous voice recording on Android, backed up to <strong>your own</strong> Google Drive, with a loud alarm the moment a backup is missing.</p>
+
+<a class="btn" href="RecVault-1.2.apk" download>Download RecVault 1.2 (APK, 6.7 MB)</a>
+<a class="btn ghost" href="https://github.com/Womp-Womp/RecVault">Source code</a>
+
+<div class="card">
+<strong>Check your download.</strong> SHA-256 of <code>RecVault-1.2.apk</code> (7,024,083 bytes):
+<code class="hash">86A6D59131D5C1A527F346E8D5161C50EE6A3D9722ADCA116A6082DBA11756F6</code>
+<span class="muted">Signing certificate SHA-1: <code>DF:E2:A5:02:26:FF:3F:7A:27:B6:25:E9:0D:6C:7E:93:90:18:D9:DF</code>. Android refuses to install an APK if even one byte was changed.</span>
+</div>
+
+<h2>What it does</h2>
+<ul>
+<li>Records in 15-minute chunks and uploads each finished chunk to Google Drive, every 15 minutes or sooner.</li>
+<li>Counts a file as backed up only when Drive reports the same name, size and fingerprint as the phone.</li>
+<li>Rings an alarm that won't swipe away if a recording is unconfirmed after 75 minutes, if recording stops, or if storage runs low.</li>
+<li>Never deletes anything. Recordings stay in <code>Recordings/RecVault</code> even if you uninstall.</li>
+<li>Survives a dead battery: a half-written chunk still plays up to the last second.</li>
+<li>No ads, no analytics, no servers. It can only see files it created in your Drive.</li>
+</ul>
+
+<h2>Install</h2>
+<ol>
+<li>Open this page on your Android phone and tap Download.</li>
+<li>Tap the downloaded file. Allow installs from that source when asked. If Play Protect warns about an unknown app, tap <strong>More details › Install anyway</strong>.</li>
+<li>Open RecVault: allow microphone, notifications and audio; tap <strong>Let RecVault run unrestricted</strong>; tap <strong>Connect Google Drive</strong>; tap <strong>Start recording</strong>.</li>
+</ol>
+<p class="muted">Android 10 or newer. Google Drive sign-in is in limited testing while the app completes Google's review.</p>
+
+<h2>Proven, not promised</h2>
+<p>The backup rules are checked by 17 machine-verified theorems in Lean 4, and the app's own code is tested against each one. The headline theorem: <em>if the alarm is quiet, every recording older than 75 minutes is confirmed in the cloud.</em> Android, Google's servers and the microphone can't be proven, which is why the alarm exists. <a href="https://github.com/Womp-Womp/RecVault#verification">Details</a>.</p>
+
+<h2>Support</h2>
+<p>RecVault is free and public domain. If it helps you, chip in directly, 100% to the developer:</p>
+<a class="btn ghost" href="https://venmo.com/u/Timothy-Lee-427">Venmo @Timothy-Lee-427</a>
+<a class="btn ghost" href="https://cash.app/$timwlee">Cash App $timwlee</a>
+
+<footer>
+<a href="privacy.html">Privacy policy</a> · <a href="https://github.com/Womp-Womp/RecVault/issues">Report a problem</a> · Unlicense (public domain)
+</footer>
+</main>
+</body>
+</html>
