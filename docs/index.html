@@ -21,14 +21,16 @@
 <span class="muted">Signing certificate SHA-1: <code>DF:E2:A5:02:26:FF:3F:7A:27:B6:25:E9:0D:6C:7E:93:90:18:D9:DF</code>. Android refuses to install an APK if even one byte was changed.</span>
 </div>
 
-<h2>What it does</h2>
+<h2>In plain words</h2>
 <ul>
-<li>Records in 15-minute chunks and uploads each finished chunk to Google Drive, every 15 minutes or sooner.</li>
-<li>Counts a file as backed up only when Drive reports the same name, size and fingerprint as the phone.</li>
-<li>Rings an alarm that won't swipe away if a recording is unconfirmed after 75 minutes, if recording stops, or if storage runs low.</li>
-<li>Never deletes anything. Recordings stay in <code>Recordings/RecVault</code> even if you uninstall.</li>
-<li>Survives a dead battery: a half-written chunk still plays up to the last second.</li>
-<li>No ads, no analytics, no servers. It can only see files it created in your Drive.</li>
+<li><strong>Records all day,</strong> even with the screen off and the phone in your pocket.</li>
+<li><strong>Copies every recording to your own Google Drive</strong> within about 15 minutes of it being made.</li>
+<li><strong>Double-checks every copy.</strong> It asks Google what it actually stored and compares it to the phone, byte for byte.</li>
+<li><strong>Rings like an alarm clock if anything goes wrong:</strong> a copy goes missing, recording stops, or the phone runs low on space. The alarm says why and won't swipe away until it's fixed.</li>
+<li><strong>Never deletes anything.</strong> Your recordings stay on the phone even if you uninstall the app.</li>
+<li><strong>A dead battery costs seconds, not the recording.</strong> Everything up to the moment the phone died still plays.</li>
+<li><strong>Private.</strong> No ads, no tracking, no company servers. Your recordings go from your phone to your Drive and nowhere else.</li>
+<li><strong>Light on space:</strong> about 350 MB a day of nonstop recording.</li>
 </ul>
 
 <h2>Install</h2>
@@ -38,6 +40,38 @@
 <li>Open RecVault: allow microphone, notifications and audio; tap <strong>Let RecVault run unrestricted</strong>; tap <strong>Connect Google Drive</strong>; tap <strong>Start recording</strong>.</li>
 </ol>
 <p class="muted">Android 10 or newer. Any Google account can connect; RecVault asks only for access to the files it creates.</p>
+
+<h2>Technical details</h2>
+<div class="table-wrap">
+<table>
+<tr><th colspan="2">Recording</th></tr>
+<tr><td>Format</td><td>AAC-LC in an ADTS stream (<code>.aac</code>), mono, 32 kHz, 32 kbps, phone microphone</td></tr>
+<tr><td>Chunks</td><td>15 minutes each, back to back; the switch gap is measured and shown in the app</td></tr>
+<tr><td>Power-loss safety</td><td>ADTS frames (~32 ms each) are self-contained, so a cut-off chunk plays up to its last written frame</td></tr>
+<tr><td>Storage use</td><td>~14 MB/hour · ~350 MB/day · ~10.5 GB/month</td></tr>
+<tr><td>Saved to</td><td><code>Recordings/RecVault/</code> (Android 12+) or <code>Music/RecVault/</code> (Android 10–11), public MediaStore folder that survives uninstall</td></tr>
+<tr><th colspan="2">Backup</th></tr>
+<tr><td>Destination</td><td><code>My Drive › RecVault › &lt;phone name&gt;</code>, via Drive API v3 resumable upload</td></tr>
+<tr><td>Google permission</td><td><code>drive.file</code> only: can create files and see only its own files</td></tr>
+<tr><td>When</td><td>Right after each chunk closes, plus a WorkManager pass every 15 minutes (Android may delay it slightly)</td></tr>
+<tr><td>Confirmed when</td><td>A fresh listing of the Drive folder shows the same name, size and MD5 as the phone; upload responses alone are never trusted</td></tr>
+<tr><td>Retries</td><td>Automatic and idempotent: a crash or lost connection can cause a re-upload, never a loss</td></tr>
+<tr><th colspan="2">Alarms (sound + vibration, not swipeable, clear themselves when fixed)</th></tr>
+<tr><td>Not backed up</td><td>Any recording unconfirmed 75 minutes after it started</td></tr>
+<tr><td>Recording off</td><td>The phone stopped the recorder, or Android blocked a restart (e.g. after reboot): tap to resume</td></tr>
+<tr><td>Mic stuck</td><td>No audio written for 3 minutes (the recorder restarts itself after 90 seconds first)</td></tr>
+<tr><td>Low storage</td><td>Under 2 GB free on the phone</td></tr>
+<tr><td>Internal error</td><td>A backup pass or the alarm check itself failed</td></tr>
+<tr><th colspan="2">App</th></tr>
+<tr><td>Requires</td><td>Android 10+ (API 29), Google Play services for sign-in</td></tr>
+<tr><td>Permissions</td><td>Microphone, microphone foreground service, notifications, read audio, internet, wake lock, start at boot, battery-optimization exemption request</td></tr>
+<tr><td>Code it ships</td><td>Kotlin, AndroidX, WorkManager, Google Play services auth. No ad, analytics or crash-reporting SDKs</td></tr>
+<tr><td>Size</td><td>6.7 MB APK, signed with APK Signature Scheme v2</td></tr>
+<tr><td>Proofs</td><td>Lean 4 (core, no Mathlib): 17 theorems incl. <code>alarm_silent_sound</code>, <code>stale_quiet_sound</code>, <code>reach_keeps_local</code>, <code>cache_never_empty</code>, <code>verified_progress</code></td></tr>
+<tr><td>Not covered</td><td>Android, Google's servers, the compiler and the mic hardware can't be proven; the alarms watch for them instead</td></tr>
+<tr><td>Known limits</td><td>Android 14+ won't let any app restart the mic on its own after a reboot or update (you get a tap-to-resume alarm). If the phone force-kills the app, it can't warn you, so set battery to Unrestricted</td></tr>
+</table>
+</div>
 
 <h2>Proven, not promised</h2>
 <p>The backup rules are checked by 17 machine-verified theorems in Lean 4, and the app's own code is tested against each one. The headline theorem: <em>if the alarm is quiet, every recording older than 75 minutes is confirmed in the cloud.</em> Android, Google's servers and the microphone can't be proven, which is why the alarm exists. <a href="https://github.com/Womp-Womp/RecVault#verification">Details</a>.</p>

@@ -6,13 +6,52 @@
 
 RecVault records in 15-minute chunks and uploads each finished chunk to Google Drive. A file only counts as backed up when Drive reports the same name, size and MD5 fingerprint as the file on the phone. If a recording is still unconfirmed after 75 minutes, or recording stops, or the phone is low on space, you get an alarm-sound notification that won't swipe away and that says why.
 
+## In plain words
+
+- **Records all day,** even with the screen off and the phone in your pocket.
+- **Copies every recording to your own Google Drive** within about 15 minutes of it being made.
+- **Double-checks every copy.** It asks Google what it actually stored and compares it to the phone, byte for byte.
+- **Rings like an alarm clock if anything goes wrong:** a copy goes missing, recording stops, or the phone runs low on space. The alarm says why and won't swipe away until it's fixed.
+- **Never deletes anything.** Your recordings stay on the phone even if you uninstall the app.
+- **A dead battery costs seconds, not the recording.** Everything up to the moment the phone died still plays.
+- **Private.** No ads, no tracking, no company servers. Your recordings go from your phone to your Drive and nowhere else.
+- **Light on space:** about 350 MB a day of nonstop recording.
+
 ## What it guarantees
 
 - **Nothing is deleted.** RecVault has no delete code. Recordings live in the public `Recordings/RecVault` folder and survive uninstalling the app.
-- **Power loss costs seconds, not the chunk.** Audio is AAC in an ADTS stream, so every ~23 ms frame stands alone. A half-written chunk still plays.
+- **Power loss costs seconds, not the chunk.** Audio is AAC in an ADTS stream, so every ~32 ms frame stands alone. A half-written chunk still plays.
 - **Verified, not assumed.** After uploading, RecVault re-lists the cloud folder and compares fingerprints. It never trusts an upload response alone.
 - **No silent failure.** If the alarm is quiet, every recording older than 75 minutes is confirmed in the cloud. That rule is machine-checked (see below).
 - **No ads, no analytics, no servers.** The only network traffic is between your phone and your own Google account. Scope is `drive.file`: RecVault can only see files it created.
+
+## Technical details
+
+| | |
+|---|---|
+| **Recording** | |
+| Format | AAC-LC in an ADTS stream (`.aac`), mono, 32 kHz, 32 kbps, phone microphone |
+| Chunks | 15 minutes each, back to back; the switch gap is measured and shown in the app |
+| Power-loss safety | ADTS frames (~32 ms each) are self-contained, so a cut-off chunk plays up to its last written frame |
+| Storage use | ~14 MB/hour · ~350 MB/day · ~10.5 GB/month |
+| Saved to | `Recordings/RecVault/` (Android 12+) or `Music/RecVault/` (Android 10–11), public MediaStore folder that survives uninstall |
+| **Backup** | |
+| Destination | `My Drive › RecVault › <phone name>`, Drive API v3 resumable upload |
+| Google permission | `drive.file` only: can create files and see only its own files |
+| When | Right after each chunk closes, plus a WorkManager pass every 15 minutes (Android may delay it slightly) |
+| Confirmed when | A fresh listing of the Drive folder shows the same name, size and MD5 as the phone; upload responses alone are never trusted |
+| Retries | Automatic and idempotent: a crash or lost connection can cause a re-upload, never a loss |
+| **Alarms** | sound + vibration, not swipeable, clear themselves when fixed |
+| Not backed up | Any recording unconfirmed 75 minutes after it started |
+| Recording off | The phone stopped the recorder, or Android blocked a restart (e.g. after reboot): tap to resume |
+| Mic stuck | No audio written for 3 minutes (the recorder restarts itself after 90 seconds first) |
+| Low storage | Under 2 GB free on the phone |
+| Internal error | A backup pass or the alarm check itself failed |
+| **App** | |
+| Requires | Android 10+ (API 29), Google Play services for sign-in |
+| Permissions | `RECORD_AUDIO`, `FOREGROUND_SERVICE_MICROPHONE`, `POST_NOTIFICATIONS`, `READ_MEDIA_AUDIO`, `INTERNET`, `WAKE_LOCK`, `RECEIVE_BOOT_COMPLETED`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` |
+| Code it ships | Kotlin, AndroidX, WorkManager, Google Play services auth. No ad, analytics or crash-reporting SDKs |
+| Size | 6.7 MB APK, APK Signature Scheme v2 |
 
 ## Verification
 
